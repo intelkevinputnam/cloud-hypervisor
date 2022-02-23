@@ -1,3 +1,14 @@
+
+# Cloud Hypervisor
+
+```{toctree}
+---
+glob: True
+hidden: True
+---
+docs/*
+```
+
 - [1. What is Cloud Hypervisor?](#1-what-is-cloud-hypervisor)
   - [Objectives](#objectives)
     - [High Level](#high-level)
@@ -25,7 +36,7 @@
   - [Join us](#join-us)
   - [Security issues](#security-issues)
 
-# 1. What is Cloud Hypervisor?
+## 1. What is Cloud Hypervisor?
 
 Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on
 top of [KVM](https://www.kernel.org/doc/Documentation/virtual/kvm/api.txt)
@@ -41,9 +52,9 @@ paravirtualised devices (i.e. virtio), no requirement for legacy devices, and
 Cloud Hypervisor is implemented in [Rust](https://www.rust-lang.org/) and is
 based on the [rust-vmm](https://github.com/rust-vmm) crates.
 
-## Objectives
+### Objectives
 
-### High Level
+#### High Level
 
 - Runs on KVM or MSHV
 - Minimal emulation
@@ -56,23 +67,23 @@ based on the [rust-vmm](https://github.com/rust-vmm) crates.
 - CPU, memory, PCI hotplug
 - Machine to machine migration
 
-### Architectures
+#### Architectures
 
 Cloud Hypervisor supports the `x86-64` and `AArch64` architectures. There are
 some small differences in functionality between the two architectures
 (see [#1125](https://github.com/cloud-hypervisor/cloud-hypervisor/issues/1125)).
 
-### Guest OS
+#### Guest OS
 
 Cloud Hypervisor supports `64-bit Linux` and Windows 10/Windows Server 2019.
 
-# 2. Getting Started
+## 2. Getting Started
 
 Below sections describe how to build and run Cloud Hypervisor on the `x86_64`
 platform. For getting started on the `AArch64` platform, please refer to the
 [Arm64 documentation](docs/arm64.md).
 
-## Preparation
+### Preparation
 
 We create a folder to build and run `cloud-hypervisor` at `$HOME/cloud-hypervisor`
 
@@ -81,7 +92,7 @@ $ export CLOUDH=$HOME/cloud-hypervisor
 $ mkdir $CLOUDH
 ```
 
-## Install prerequisites
+### Install prerequisites
 
 You need to install some prerequisite packages in order to build and test Cloud
 Hypervisor. Here, all the steps are based on Ubuntu, for other Linux
@@ -98,7 +109,7 @@ $ sudo apt install build-essential
 $ rustup target add x86_64-unknown-linux-musl
 ```
 
-## Clone and build
+### Clone and build
 
 First you need to clone and build the cloud-hypervisor repo:
 
@@ -119,7 +130,7 @@ $ popd
 This will build a `cloud-hypervisor` binary under
 `$CLOUDH/cloud-hypervisor/target/release/cloud-hypervisor`.
 
-### Containerized builds and tests
+#### Containerized builds and tests
 
 If you want to build and test Cloud Hypervisor without having to install all the
 required dependencies (The rust toolchain, cargo tools, etc), you can also use
@@ -147,12 +158,12 @@ $ ./scripts/dev_cli.sh tests --unit
 Run the `./scripts/dev_cli.sh --help` command to view all the supported
 development script commands and their related options.
 
-## Run
+### Run
 
 You can run a guest VM by either using an existing cloud image or booting into
 your own kernel and disk image.
 
-### Cloud image
+#### Cloud image
 
 Cloud Hypervisor supports booting disk images containing all needed
 components to run cloud workloads, a.k.a. cloud images. To do that we rely on
@@ -186,9 +197,9 @@ $ popd
 
 Multiple arguments can be given to the `--disk` parameter.
 
-### Custom kernel and disk image
+#### Custom kernel and disk image
 
-#### Building your kernel
+##### Building your kernel
 
 Cloud Hypervisor also supports direct kernel boot into a `vmlinux` ELF kernel.
 In order to support virtio-watchdog we have our own development branch. You are
@@ -213,7 +224,7 @@ $ popd
 The `vmlinux` kernel image will then be located at
 `linux-cloud-hypervisor/arch/x86/boot/compressed/vmlinux.bin`.
 
-#### Disk image
+##### Disk image
 
 For the disk image, we will use a Ubuntu cloud image that contains a root
 partition:
@@ -225,7 +236,7 @@ $ qemu-img convert -p -f qcow2 -O raw focal-server-cloudimg-amd64.img focal-serv
 $ popd
 ```
 
-#### Booting the guest VM
+##### Booting the guest VM
 
 Now we can directly boot into our custom kernel and make it use the Ubuntu root
 partition. If we want to have 4 vCPUs and 1024 MBytes of memory:
@@ -261,7 +272,7 @@ $ ./cloud-hypervisor/target/release/cloud-hypervisor \
 	--net "tap=,mac=,ip=,mask="
 ```
 
-# 3. Status
+## 3. Status
 
 Cloud Hypervisor is under active development. The following stability guarantees
 are currently made:
@@ -291,25 +302,25 @@ As of 2021-04-29, the following cloud images are supported:
 Direct kernel boot to userspace should work with a rootfs from most
 distributions.
 
-## Hot Plug
+### Hot Plug
 
 Cloud Hypervisor supports hotplug of CPUs, passthrough devices (VFIO),
 `virtio-{net,block,pmem,fs,vsock}` and memory resizing. This
 [document](docs/hotplug.md) details how to add devices to a running VM.
 
-## Device Model
+### Device Model
 
 Details of the device model can be found in this
 [documentation](docs/device_model.md).
 
-## TODO
+### TODO
 
 We are not tracking the Cloud Hypervisor TODO list from a specific git tracked
 file but through
 [github issues](https://github.com/cloud-hypervisor/cloud-hypervisor/issues/new)
 instead.
 
-# 4. `rust-vmm` project dependency
+## 4. `rust-vmm` project dependency
 
 In order to satisfy the design goal of having a high-performance,
 security-focused hypervisor the decision was made to use the
@@ -334,7 +345,7 @@ Hypervisor relationship with the rust-vmm project is twofold:
    the Cloud Hypervisor VMM to implement and test them, and contribute them back
    to the rust-vmm project.
 
-## Firecracker and crosvm
+### Firecracker and crosvm
 
 A large part of the Cloud Hypervisor code is based on either the Firecracker or
 the crosvm projects implementations. Both of these are VMMs written in Rust with
@@ -352,13 +363,13 @@ more features to support our use cases, we believe that the divergence will
 increase while at the same time sharing as much of the fundamental
 virtualization code through the rust-vmm project crates as possible.
 
-# 5. Community
+## 5. Community
 
 The Cloud Hypervisor project follows the governance, and community guidelines
 described in the [Community](https://github.com/cloud-hypervisor/community)
 repository.
 
-## Contribute
+### Contribute
 
 We are working on building a global, diverse and collaborative community around
 the Cloud Hypervisor project. Anyone who is interested in
@@ -370,11 +381,11 @@ reviews, bug reports, feature requests, project improvement suggestions, etc,
 are all equal and welcome means of contribution. See the
 [CONTRIBUTING](CONTRIBUTING.md) document for more details.
 
-## Join us
+### Join us
 
 Get an [invite to our Slack channel](https://join.slack.com/t/cloud-hypervisor/shared_invite/enQtNjY3MTE3MDkwNDQ4LWQ1MTA1ZDVmODkwMWQ1MTRhYzk4ZGNlN2UwNTI3ZmFlODU0OTcwOWZjMTkwZDExYWE3YjFmNzgzY2FmNDAyMjI)
 and [join us on Slack](https://cloud-hypervisor.slack.com/).
 
-## Security issues
+### Security issues
 
 Please contact the maintainers listed in the MAINTAINERS.md file with security issues.
